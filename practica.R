@@ -19,7 +19,7 @@ nc = nc_open(archivo)
 nombre_var = names(nc$var)
 # Nombre de las dimensiones
 nombres_dim = names(nc$dim)
-# Extraigo datos de las dimensiones (lat,long,tiempo) 
+# Extraigo datos de las dimensiones (lat,long,tiempo)
 datos_dim = 0
 for (i in 1:length(nombres_dim)) {
   datos_dim[i] = list(ncvar_get(nc, nombres_dim[i]))
@@ -38,7 +38,7 @@ variable = ncvar_get(nc, "precip", start = c(lons[1],lats[1], 1), count = c(leng
 ## Array de 3 dimensiones latxlonxtiempo
 
 # Ahora quiero hacer promedios estacionales para el (1981-2010). Tengo que promediar , mar+abr+may,
-# jun+jul+ago y sep+oct+nov. 
+# jun+jul+ago y sep+oct+nov.
 
 # Tiempo
 
@@ -52,7 +52,7 @@ anios = as.integer(substr(fechas,1,4)) #Vector con los años como enteros
 variable_recorte = variable[,, which((anios>1980) & (anios<2011))] #Uso el vector de anios para hacer el recorte
 fechas = fechas[which((anios>1980) & (anios<2011))]
 
-## Ahora hago variables por estacion 
+## Ahora hago variables por estacion
 
 pp_verano = variable_recorte[,,(months(fechas)== "enero"
                                 | months(fechas)== "diciembre"
@@ -72,7 +72,7 @@ media_pp_MAM = apply(pp_otonio, c(1,2), mean)
 media_pp_JJA = apply(pp_invierno, c(1,2), mean)
 media_pp_SON = apply(pp_primavera, c(1,2), mean)
 
-# Grafico 
+# Grafico
 
 ## Para usar ggplot2 necesito generar data frames con los datos
 
@@ -92,7 +92,7 @@ df_SON = data.frame(x=rep(datos_dim$lon[lons], length(lats)),
                     y=rep(datos_dim$lat[lats], each=length(lons)),
                     z=array(media_pp_SON, length(lats)*length(lons)))
 
-## Ajustes estéticos 
+## Ajustes estéticos
 map.world <- map_data("world2")
 my_fill <- scale_fill_distiller(palette='GnBu', direction = 1,limits = c(0,8),breaks=pretty_breaks(10),labs(fill = "mm/día"))
 my_theme <- theme_bw() + theme(panel.ontop=TRUE,
@@ -214,7 +214,7 @@ acumulado = apply(prom_espacial, 2, sum)
 
 df = data.frame(Fecha=anios, Precipitación=acumulado)
 
-## Ploteo 
+## Ploteo
 
 p = ggplot(df, aes(x=Fecha,y=Precipitación)) +
   geom_point(aes(group=1)) +
@@ -229,3 +229,5 @@ p = ggplot(df, aes(x=Fecha,y=Precipitación)) +
 p
 
 lm(Precipitación ~ Fecha, df)
+
+## Holi
