@@ -36,15 +36,16 @@ TIMEMIN = str(ANIO_MIN)+'-01-01'
 TIMEMAX = str(ANIO_MAX)+'-12-31'
 
 # Directorio al archivo
-DATOS='/home/dalia/Proyecto/BasesDatos/precip.mon.total.v2018.nc'
-
+DATOS_GPCC='/home/dalia/Proyecto/BasesDatos/precip.mon.total.v2018.nc'
+DATOS_CMAP='/home/dalia/Proyecto/BasesDatos/CMAP_precip.mon.mean.nc'
+DATOS_CRU='/home/dalia/Proyecto/BasesDatos/cru_ts4.05.1901.2020.pre.dat.nc'
 # Directorio a salidas
 SALIDAS='/home/dalia/Proyecto/Salidas/'
 
 #%%
 
 # Abro el archivo usando xarray
-ds=xr.open_dataset(DATOS)
+ds=xr.open_dataset(DATOS_CMAP)
 
 # Hago recorte
 ds_recorte = ds.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE),
@@ -95,12 +96,55 @@ plt.title("Anomalía de precipitación para el centro de Argentina \n (25°S-36�
 fig.savefig(SALIDAS+"AnomaliaPP_CentroArgentina.png", dpi=300)
 plt.show()
 
+
+
+#%%
+
+# CRU #
+
+#%%
+
+LON_OESTE=-67
+LON_ESTE=-60
+
+#%%
+
+# Abro el archivo usando xarray
+ds=xr.open_dataset(DATOS_CRU)
+
+ds
+# Hago recorte
+ds_recorte = ds.sel(lat=slice(LAT_SUR, LAT_NOR), lon=slice(LON_OESTE,LON_ESTE),
+                        time=slice(TIMEMIN,TIMEMAX))
+
+ds_anual = ds_recorte.resample(time="Y").sum()
+
+
+ds_media = ds_anual.mean()
+
+ds_anual_anomalia = ds_anual.mean("lat").mean("lon")-ds_media
+
+#Al calcular la media en cada punto de grilla debo considerar de que el area 
+#en el cual se aplica el promedio es considerablemente mas grande en el Ecuador
+#que en los Polos. Por eso, puedo aplicar una corrección, multiplicando la 
+#media por el coseno de la latitud. Así se tendrá en cuenta que a menores latitudes
+#el espacio es mayor y por ende el valor de pp pesa mas.
+
+weights = np.cos(np.deg2rad(ds_anual.lat))
+
+#Aplicamos los pesos para el dataset que estamos usando con la función "weighted"
+ds_anual_weighted = ds_anual.weighted(weights)
+#Ahora sí, hacemos el promedio para las latitudes y longitudes pero considerando los pesos
+ds_anual_PromReg=ds_anual_weighted.mean(("lon", "lat"))
+
+ds_anom_corr = ds_anual_PromReg-ds_media
+
 #%%
 
 fig, ax = plt.subplots()
 
 #ax.plot(ds_anual_anomalia["precip"]["time.year"], [0]*len(ds_anual_anomalia["precip"]["time.year"]), "k-")
-bars = ax.bar(ds_anom_corr["precip"]["time.year"],ds_anom_corr["precip"])
+bars = ax.bar(ds_anual_anomalia["pre"]["time.year"],ds_anual_anomalia["pre"])
 
 for i in range(len(bars)):
 
@@ -115,9 +159,8 @@ ax.set_xlabel("Año")
 
 plt.title("Anomalía de precipitación para el centro de Argentina \n (25°S-36°S, 67°O-60°O)")
 
-fig.savefig(SALIDAS+"AnomaliaPP_Corregida_CentroArgentina.png", dpi=300)
+fig.savefig(SALIDAS+"AnomaliaPP_CentroArgentina_CRU.png", dpi=300)
 plt.show()
 
-
-
+#%%
 

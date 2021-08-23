@@ -58,14 +58,14 @@ def trend_xarray(ds,VAR) :
 # Constantes (en mayuscula)
 LAT_SUR_G=-60
 LAT_NOR_G=-20
-LON_OESTE_G=-80
-LON_ESTE_G=-40
+LON_OESTE_G=280
+LON_ESTE_G=320
 
 # Para cuentas
 LAT_SUR=-63
 LAT_NOR=-17
-LON_OESTE=-83
-LON_ESTE=-37
+LON_OESTE=273
+LON_ESTE=323
 
 
 # Periodo 1
@@ -83,29 +83,29 @@ TIEMPO2_MIN=str(PER1_ANIO_MIN)+'-01-01'
 TIEMPO2_MAX= str(PER2_ANIO_MAX)+'-12-31'
 
 # Directorio al archivo
-DATOS='/home/dalia/Proyecto/BasesDatos/gistemp250_GHCNv4.nc'
-
+DATOS_GISS='/home/dalia/Proyecto/BasesDatos/air.2x2.250.mon.anom.land.nc'
+DATOS_CRU='/home/dalia/Proyecto/BasesDatos/air.mon.anom.nc'
 # Directorio a salidas
 SALIDAS='/home/dalia/Proyecto/Salidas/'
 
 #%%
 
 # Abro el archivo usando xarray
-data=xr.open_dataset(DATOS)
+data=xr.open_dataset(DATOS_GISS)
 
 # Hago recorte para el periodo 1
-data_per1 = data.sel(lat=slice(LAT_SUR, LAT_NOR), lon=slice(LON_OESTE,LON_ESTE),
+data_per1 = data.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE),
                         time=slice(TIEMPO1_MIN,TIEMPO1_MAX))
 # Hago recorte para el período 2
-data_per2 = data.sel(lat=slice(LAT_SUR, LAT_NOR), lon=slice(LON_OESTE,LON_ESTE),
+data_per2 = data.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE),
                         time=slice(TIEMPO2_MIN,TIEMPO2_MAX))
 
 
 #%%
 #Calculo la tendencia usando la función antes definida
  
-tend_per1,pv_tend_per1=trend_xarray(data_per1,'tempanomaly')
-tend_per2,pv_tend_per2=trend_xarray(data_per2,'tempanomaly')
+tend_per1,pv_tend_per1=trend_xarray(data_per1,'air')
+tend_per2,pv_tend_per2=trend_xarray(data_per2,'air')
 
 #%%
 
@@ -126,6 +126,7 @@ ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
 ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
 
@@ -141,8 +142,8 @@ ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
 im=ax.contourf(lons, lats, tend_per1*10,cmap="viridis_r",extend='both',transform=crs_latlon)
 ax.contour(lons, lats, pv_tend_per1,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=5)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -159,6 +160,7 @@ ax = plt.subplot(gs[1],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
 ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
 
@@ -174,8 +176,8 @@ ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
 im=ax.contourf(lons, lats, tend_per2*10,cmap="viridis_r",extend='both',transform=crs_latlon)
 ax.contour(lons, lats, pv_tend_per2,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=5)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -194,4 +196,126 @@ fig.colorbar(im, cax=cbar_ax,orientation='vertical')
 
 fig.suptitle("Tendencia lineal de temperatura",fontsize=14)
 
-fig.savefig(SALIDAS+"TendenciasLinealesTemperatura.png", dpi=300, bbox_inches='tight')
+fig.savefig(SALIDAS+"TendenciaTemperatura_GISS.png", dpi=300, bbox_inches='tight')
+
+#%%
+
+# CRU #
+
+#%%
+
+LON_ESTE_G=-40
+LON_OESTE_G=-80
+
+LON_ESTE=-37
+LON_OESTE=-83
+
+#%%
+
+# Abro el archivo usando xarray
+data=xr.open_dataset(DATOS_CRU)
+
+# Hago recorte para el periodo 1
+data_per1 = data.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE),
+                        time=slice(TIEMPO1_MIN,TIEMPO1_MAX))
+# Hago recorte para el período 2
+data_per2 = data.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE),
+                        time=slice(TIEMPO2_MIN,TIEMPO2_MAX))
+
+
+#%%
+#Calculo la tendencia usando la función antes definida
+ 
+tend_per1,pv_tend_per1=trend_xarray(data_per1,'air')
+tend_per2,pv_tend_per2=trend_xarray(data_per2,'air')
+
+#%%
+
+#Grafico 
+
+#Define figure
+fig, ax = plt.subplots(figsize=(5.3,3.3))
+
+#Define grid for subplots
+gs = gridspec.GridSpec(1,2)     
+
+#latitudes and longitudes to plot
+lons, lats = np.meshgrid(data_per1['lon'], data_per1['lat'])
+
+#Tendencias periodo 1
+
+ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
+
+crs_latlon = ccrs.PlateCarree()
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
+
+# Create a feature for States/Admin 1 regions at 1:50m from Natural Earth
+states_provinces = cartopy.feature.NaturalEarthFeature(
+    category='cultural',
+    name='admin_1_states_provinces_lines',
+    scale='10m',
+    facecolor='none')
+
+ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
+
+im=ax.contourf(lons, lats, tend_per1*10,cmap="viridis_r",extend='both',transform=crs_latlon)
+ax.contour(lons, lats, pv_tend_per1,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
+
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
+ax.grid(which='both', linewidth=0.3, linestyle='-')
+ax.tick_params(axis='both', which='major', labelsize=5)
+lon_formatter = LongitudeFormatter(zero_direction_label=True)
+lat_formatter = LatitudeFormatter()
+ax.xaxis.set_major_formatter(lon_formatter)
+ax.yaxis.set_major_formatter(lat_formatter)    
+
+ax.set_title(str(PER1_ANIO_MIN)+"-"+str(PER1_ANIO_MAX))
+
+
+#Tendencias periodo 2
+
+ax = plt.subplot(gs[1],projection=ccrs.PlateCarree(central_longitude=180))
+
+crs_latlon = ccrs.PlateCarree()
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
+
+# Create a feature for States/Admin 1 regions at 1:50m from Natural Earth
+states_provinces = cartopy.feature.NaturalEarthFeature(
+    category='cultural',
+    name='admin_1_states_provinces_lines',
+    scale='10m',
+    facecolor='none')
+
+ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
+
+im=ax.contourf(lons, lats, tend_per2*10,cmap="viridis_r",extend='both',transform=crs_latlon)
+ax.contour(lons, lats, pv_tend_per2,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
+
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
+ax.grid(which='both', linewidth=0.3, linestyle='-')
+ax.tick_params(axis='both', which='major', labelsize=5)
+lon_formatter = LongitudeFormatter(zero_direction_label=True)
+lat_formatter = LatitudeFormatter()
+ax.xaxis.set_major_formatter(lon_formatter)
+ax.yaxis.set_major_formatter(lat_formatter)   
+
+ax.set_title(str(PER2_ANIO_MIN)+"-"+str(PER2_ANIO_MAX))
+
+#Plot colorbar
+cbar_ax = fig.add_axes([0.98, 0.1, 0.03, 0.8])
+
+fig.colorbar(im, cax=cbar_ax,orientation='vertical') 
+
+
+
+fig.suptitle("Tendencia lineal de temperatura",fontsize=14)
+
+fig.savefig(SALIDAS+"TenndeciaTemperatura_CRU.png", dpi=300, bbox_inches='tight')

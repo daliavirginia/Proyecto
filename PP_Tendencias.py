@@ -56,10 +56,15 @@ def trend_xarray(ds,VAR) :
 # Declaro variables
 
 # Constantes (en mayuscula)
-LAT_SUR=-60
-LAT_NOR=-20
-LON_ESTE=320
-LON_OESTE=280
+LAT_SUR_G=-60
+LAT_NOR_G=-20
+LON_ESTE_G=320
+LON_OESTE_G=280
+
+LAT_SUR=-63
+LAT_NOR=-17
+LON_ESTE=323
+LON_OESTE=277
 
 # Periodo 1
 PER1_ANIO_MIN=1940
@@ -76,15 +81,16 @@ TIEMPO2_MIN=str(PER1_ANIO_MIN)+'-01-01'
 TIEMPO2_MAX= str(PER2_ANIO_MAX)+'-12-31'
 
 # Directorio al archivo
-DATOS='/home/dalia/Proyecto/BasesDatos/precip.mon.total.v2018.nc'
-
+DATOS_GPCC='/home/dalia/Proyecto/BasesDatos/precip.mon.total.v2018.nc'
+DATOS_CMAP='/home/dalia/Proyecto/BasesDatos/CMAP_precip.mon.mean.nc'
+DATOS_CRU='/home/dalia/Proyecto/BasesDatos/cru_ts4.05.1901.2020.pre.dat.nc'
 # Directorio a salidas
 SALIDAS='/home/dalia/Proyecto/Salidas/'
 
 #%%
 
 # Abro el archivo usando xarray
-data=xr.open_dataset(DATOS)
+data=xr.open_dataset(DATOS_GPCC)
 
 # Hago recorte para el periodo 1
 data_per1 = data.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE),
@@ -118,7 +124,8 @@ lons, lats = np.meshgrid(data_per1['lon'], data_per1['lat'])
 ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_SUR, LAT_NOR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
 
@@ -151,7 +158,8 @@ ax.set_title(str(PER1_ANIO_MIN)+"-"+str(PER1_ANIO_MAX))
 ax = plt.subplot(gs[1],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_SUR, LAT_NOR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
 
@@ -185,9 +193,203 @@ fig.colorbar(im, cax=cbar_ax,orientation='vertical')
 
 
 
-fig.suptitle("Tendencia lineal de precipitación \n GPCC",fontsize=14)
+fig.suptitle("Tendencia lineal de precipitación",fontsize=14)
 
-fig.savefig(SALIDAS+"TendenciasLineales.png", dpi=300, bbox_inches='tight')
+fig.savefig(SALIDAS+"TendenciasLineales_GPCC.png", dpi=300, bbox_inches='tight')
 
 #%%
 
+# DATOS CMAP #
+
+#%%
+
+# Abro el archivo usando xarray
+data=xr.open_dataset(DATOS_CMAP)
+
+# Hago recorte para el periodo 1
+data_per1 = data.sel(lat=slice(LAT_NOR, LAT_SUR), lon=slice(LON_OESTE,LON_ESTE))
+
+#%%
+#Calculo la tendencia usando la función antes definida
+ 
+tend_per1,pv_tend_per1=trend_xarray(data_per1,'precip')
+
+#%%
+
+#Grafico 
+
+#Define figure
+fig, ax = plt.subplots(figsize=(4.5,4.3))
+
+#Define grid for subplots
+gs = gridspec.GridSpec(1,1)     
+
+#latitudes and longitudes to plot
+lons, lats = np.meshgrid(data_per1['lon'], data_per1['lat'])
+
+#Tendencias periodo 1
+
+ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
+
+crs_latlon = ccrs.PlateCarree()
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
+
+# Create a feature for States/Admin 1 regions at 1:50m from Natural Earth
+states_provinces = cartopy.feature.NaturalEarthFeature(
+    category='cultural',
+    name='admin_1_states_provinces_lines',
+    scale='10m',
+    facecolor='none')
+
+ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
+
+im=ax.contourf(lons, lats, tend_per1*10,cmap="viridis_r",extend='both',transform=crs_latlon)
+ax.contour(lons, lats, pv_tend_per1,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
+
+ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.grid(which='both', linewidth=0.3, linestyle='-')
+ax.tick_params(axis='both', which='major', labelsize=5)
+lon_formatter = LongitudeFormatter(zero_direction_label=True)
+lat_formatter = LatitudeFormatter()
+ax.xaxis.set_major_formatter(lon_formatter)
+ax.yaxis.set_major_formatter(lat_formatter)    
+
+ax.set_title('1979-2016')
+
+
+#Plot colorbar
+cbar_ax = fig.add_axes([0.98, 0.1, 0.03, 0.8])
+
+fig.colorbar(im, cax=cbar_ax,orientation='vertical') 
+
+
+
+fig.suptitle("Tendencia lineal de precipitación",fontsize=14)
+
+fig.savefig(SALIDAS+"TendenciasLineales_CMAP.png", dpi=300, bbox_inches='tight')
+
+#%%
+
+# CRU #
+
+#%%
+
+LON_ESTE_G=-40
+LON_OESTE_G=-80
+
+LON_ESTE=-37
+LON_OESTE=-83
+
+#%%
+
+# Abro el archivo usando xarray
+data=xr.open_dataset(DATOS_CRU)
+
+data
+
+# Hago recorte para el periodo 1
+data_per1 = data.sel(lat=slice(LAT_SUR, LAT_NOR), lon=slice(LON_OESTE,LON_ESTE),
+                        time=slice(TIEMPO1_MIN,TIEMPO1_MAX))
+# Hago recorte para el período 2
+data_per2 = data.sel(lat=slice(LAT_SUR, LAT_NOR), lon=slice(LON_OESTE,LON_ESTE),
+                        time=slice(TIEMPO2_MIN,TIEMPO2_MAX))
+
+
+#%%
+#Calculo la tendencia usando la función antes definida
+ 
+tend_per1,pv_tend_per1=trend_xarray(data_per1,'pre')
+tend_per2,pv_tend_per2=trend_xarray(data_per2,'pre')
+
+#%%
+
+#Grafico 
+
+#Define figure
+fig, ax = plt.subplots(figsize=(5.3,3.3))
+
+#Define grid for subplots
+gs = gridspec.GridSpec(1,2)     
+
+#latitudes and longitudes to plot
+lons, lats = np.meshgrid(data_per1['lon'], data_per1['lat'])
+
+#Tendencias periodo 1
+
+ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
+
+crs_latlon = ccrs.PlateCarree()
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
+
+# Create a feature for States/Admin 1 regions at 1:50m from Natural Earth
+states_provinces = cartopy.feature.NaturalEarthFeature(
+    category='cultural',
+    name='admin_1_states_provinces_lines',
+    scale='10m',
+    facecolor='none')
+
+ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
+
+im=ax.contourf(lons, lats, tend_per1*10,cmap="viridis_r",extend='both',transform=crs_latlon)
+ax.contour(lons, lats, pv_tend_per1,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
+
+ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.grid(which='both', linewidth=0.3, linestyle='-')
+ax.tick_params(axis='both', which='major', labelsize=5)
+lon_formatter = LongitudeFormatter(zero_direction_label=True)
+lat_formatter = LatitudeFormatter()
+ax.xaxis.set_major_formatter(lon_formatter)
+ax.yaxis.set_major_formatter(lat_formatter)    
+
+ax.set_title(str(PER1_ANIO_MIN)+"-"+str(PER1_ANIO_MAX))
+
+
+#Tendencias periodo 2
+
+ax = plt.subplot(gs[1],projection=ccrs.PlateCarree(central_longitude=180))
+
+crs_latlon = ccrs.PlateCarree()
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_SUR_G, LAT_NOR_G], crs=crs_latlon)
+ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
+
+# Create a feature for States/Admin 1 regions at 1:50m from Natural Earth
+states_provinces = cartopy.feature.NaturalEarthFeature(
+    category='cultural',
+    name='admin_1_states_provinces_lines',
+    scale='10m',
+    facecolor='none')
+
+ax.add_feature(states_provinces, edgecolor='darkslategrey', linewidths=0.3)
+
+im=ax.contourf(lons, lats, tend_per2*10,cmap="viridis_r",extend='both',transform=crs_latlon)
+ax.contour(lons, lats, pv_tend_per2,levels=[0.1],colors='r',linewidths=0.5 , transform=crs_latlon) 
+
+ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.grid(which='both', linewidth=0.3, linestyle='-')
+ax.tick_params(axis='both', which='major', labelsize=5)
+lon_formatter = LongitudeFormatter(zero_direction_label=True)
+lat_formatter = LatitudeFormatter()
+ax.xaxis.set_major_formatter(lon_formatter)
+ax.yaxis.set_major_formatter(lat_formatter)   
+
+ax.set_title(str(PER2_ANIO_MIN)+"-"+str(PER2_ANIO_MAX))
+
+#Plot colorbar
+cbar_ax = fig.add_axes([0.98, 0.1, 0.03, 0.8])
+
+fig.colorbar(im, cax=cbar_ax,orientation='vertical') 
+
+fig.suptitle("Tendencia lineal de precipitación",fontsize=14)
+
+fig.savefig(SALIDAS+"TendenciasLineales_CRU.png", dpi=300, bbox_inches='tight')
