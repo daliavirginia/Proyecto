@@ -29,16 +29,17 @@ from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 # Declaro variables
 
 # Constantes (en mayuscula)
-LAT_SUR_G=-60
-LAT_NOR_G=-20
-LON_OESTE_G=280
-LON_ESTE_G=320
+# Para grafico
+LAT_SUR_G=-36
+LAT_NOR_G=-25
+LON_OESTE_G=293
+LON_ESTE_G=300
 
-# Para cuentas
-LAT_SUR=-63
-LAT_NOR=-17
-LON_OESTE=273
-LON_ESTE=323
+# Para calculos
+LAT_SUR=-39
+LAT_NOR=-22
+LON_ESTE=303
+LON_OESTE=290
 
 # Periodo 1
 PER1_ANIO_MIN=1940
@@ -119,7 +120,8 @@ print(ds_son_dif.max())
 
 #Grafico
 
-fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
+fig, ax = plt.subplots(figsize=(2*2.7,2*4))
+#fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
 
 #Define grid for subplots
 gs = gridspec.GridSpec(2,2) 
@@ -129,8 +131,8 @@ lons, lats = np.meshgrid(ds_per1['lon'], ds_per1['lat'])
 
 #Definimos los niveles para los contornos (inferior, superior, longitud de los intervalos)
 #Si utilizamos las funciones ds.min ds.max podemos darnos una idea de cómo definirlos
-lev_inf = -1.5
-lev_sup = 1.5
+lev_inf = -1
+lev_sup = 1
 lev_int =0.1
 clevs = np.arange(lev_inf, lev_sup+lev_int, lev_int)
 
@@ -275,7 +277,7 @@ cbar_ax.set_title('°C')
 fig.colorbar(im, cax=cbar_ax,orientation='vertical')
 
 
-fig.savefig(SALIDAS + 'DiferenciaPeriodosTemp_GISS.png', dpi=300, bbox_inches='tight')
+fig.savefig(SALIDAS + 'CA_DiferenciaPeriodosTemp_GISS.png', dpi=300, bbox_inches='tight')
 
 fig.show()
 
@@ -285,11 +287,11 @@ fig.show()
 
 #%%
 
-LON_ESTE_G=-40
-LON_OESTE_G=-80
+LON_ESTE_G=-60
+LON_OESTE_G=-67
 
-LON_ESTE=-37
-LON_OESTE=-83
+LON_ESTE=-57
+LON_OESTE=-70
 
 #%%
 
@@ -339,7 +341,9 @@ ds_son_dif=ds_son_per2.mean("time")-ds_son_per1.mean("time")
 
 #Grafico
 
-fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
+fig, ax = plt.subplots(figsize=(2*2.7,2*4))
+
+#fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
 
 #Define grid for subplots
 gs = gridspec.GridSpec(2,2) 
@@ -349,8 +353,8 @@ lons, lats = np.meshgrid(ds_per1['lon'], ds_per1['lat'])
 
 #Definimos los niveles para los contornos (inferior, superior, longitud de los intervalos)
 #Si utilizamos las funciones ds.min ds.max podemos darnos una idea de cómo definirlos
-lev_inf = -1.5
-lev_sup = 1.5
+lev_inf = -1
+lev_sup = 1
 lev_int = 0.1
 clevs = np.arange(lev_inf, lev_sup+lev_int, lev_int)
 
@@ -496,6 +500,6 @@ cbar_ax.set_title('°C')
 fig.colorbar(im, cax=cbar_ax,orientation='vertical')
 
 
-fig.savefig(SALIDAS + 'DiferenciaPeriodosTemp_CRU.png', dpi=300, bbox_inches='tight')
+fig.savefig(SALIDAS + 'CA_DiferenciaPeriodosTemp_CRU.png', dpi=300, bbox_inches='tight')
 
 fig.show()

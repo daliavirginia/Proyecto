@@ -27,10 +27,16 @@ from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 # Declaro variables
 
 # Constantes (en mayuscula)
-LAT_SUR=-60
-LAT_NOR=-20
-LON_ESTE=320
-LON_OESTE=280
+LAT_SUR_G=-36
+LAT_NOR_G=-25
+LON_OESTE_G=293
+LON_ESTE_G=300
+
+# Para calculos
+LAT_SUR=-39
+LAT_NOR=-22
+LON_ESTE=303
+LON_OESTE=290
 
 # Periodo 1
 PER1_ANIO_MIN=1940
@@ -103,7 +109,11 @@ ds_son_dif=ds_son_per2.mean("time")-ds_son_per1.mean("time")
 
 #Grafico
 
-fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
+#Tamaño para mapas del centro de Argentina
+fig, ax = plt.subplots(figsize=(2*2.7,2*4))
+
+#Tamaño para sur de sudamerica
+#fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
 
 #Define grid for subplots
 gs = gridspec.GridSpec(2,2) 
@@ -113,9 +123,9 @@ lons, lats = np.meshgrid(ds_per1['lon'], ds_per1['lat'])
 
 #Definimos los niveles para los contornos (inferior, superior, longitud de los intervalos)
 #Si utilizamos las funciones ds.min ds.max podemos darnos una idea de cómo definirlos
-lev_inf = -150
-lev_sup = 150
-lev_int = 25
+lev_inf = -90
+lev_sup = 90
+lev_int = 10
 clevs = np.arange(lev_inf, lev_sup+lev_int, lev_int)
 
 #Plot DJF mean
@@ -123,7 +133,7 @@ clevs = np.arange(lev_inf, lev_sup+lev_int, lev_int)
 ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -141,8 +151,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 #Por eso selecciono la variable ["precip"]. 
 im=ax.contourf(lons, lats, ds_djf_dif["precip"],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -157,7 +167,7 @@ ax.set_title('Verano (DEF)')
 ax = plt.subplot(gs[1],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -173,8 +183,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 
 im=ax.contourf(lons, lats, ds_mam_dif["precip"],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -189,7 +199,7 @@ ax.set_title('Otoño (MAM)')
 ax = plt.subplot(gs[2],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -205,8 +215,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 
 im=ax.contourf(lons, lats, ds_jja_dif["precip"],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -221,7 +231,7 @@ ax.set_title('Invierno (JJA)')
 ax = plt.subplot(gs[3],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -236,8 +246,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 
 im=ax.contourf(lons, lats, ds_son_dif["precip"],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -259,7 +269,7 @@ cbar_ax.set_title('mm')
 fig.colorbar(im, cax=cbar_ax,orientation='vertical')
 
 
-fig.savefig(SALIDAS + 'DiferenciaPeriodos_GPCC.png', dpi=300, bbox_inches='tight')
+fig.savefig(SALIDAS + 'CA_DiferenciaPeriodos_GPCC.png', dpi=300, bbox_inches='tight')
 
 fig.show()
 
@@ -269,9 +279,35 @@ fig.show()
 
 #%%
 
-LON_ESTE=-40
-LON_OESTE=-80
+# Periodo 1
+PER1_ANIO_MIN=1940
+PER1_ANIO_MAX=1970
 
+TIEMPO1_MIN = str(PER1_ANIO_MIN)+'-01-01'
+TIEMPO1_MAX= str(PER1_ANIO_MAX)+'-12-31'
+
+# Periodo 2
+PER2_ANIO_MIN=1990
+PER2_ANIO_MAX=2020
+
+TIEMPO2_MIN=str(PER2_ANIO_MIN)+'-01-01'
+TIEMPO2_MAX= str(PER2_ANIO_MAX)+'-12-31'
+
+#Centro arg
+LON_ESTE_G=-60
+LON_OESTE_G=-67
+
+#Centro arg
+LON_ESTE=-57
+LON_OESTE=-70
+
+#Sudamerica
+LON_ESTE_G=-40
+LON_OESTE_G=-80
+
+#Sudamerica
+LON_ESTE=-37
+LON_OESTE=-83
 #%%
 
 # Abro el archivo usando xarray
@@ -321,7 +357,11 @@ ds_son_dif=ds_son_per2.mean("time")-ds_son_per1.mean("time")
 
 #Grafico
 
-fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
+#Centro de Argentina
+fig, ax = plt.subplots(figsize=(2*2.7,2*4))
+
+#Sur de sudamerica
+#fig, ax = plt.subplots(figsize=(2*3.3,2*3.5))
 
 #Define grid for subplots
 gs = gridspec.GridSpec(2,2) 
@@ -331,9 +371,9 @@ lons, lats = np.meshgrid(ds_per1['lon'], ds_per1['lat'])
 
 #Definimos los niveles para los contornos (inferior, superior, longitud de los intervalos)
 #Si utilizamos las funciones ds.min ds.max podemos darnos una idea de cómo definirlos
-lev_inf = -150
-lev_sup = 150
-lev_int = 25
+lev_inf = -90
+lev_sup = 90
+lev_int = 10
 clevs = np.arange(lev_inf, lev_sup+lev_int, lev_int)
 
 #Plot DJF mean
@@ -341,7 +381,7 @@ clevs = np.arange(lev_inf, lev_sup+lev_int, lev_int)
 ax = plt.subplot(gs[0],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -359,8 +399,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 #Por eso selecciono la variable ["precip"]. 
 im=ax.contourf(lons, lats, ds_djf_dif['pre'],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -375,7 +415,7 @@ ax.set_title('Verano (DEF)')
 ax = plt.subplot(gs[1],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -391,8 +431,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 
 im=ax.contourf(lons, lats, ds_mam_dif['pre'],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -407,7 +447,7 @@ ax.set_title('Otoño (MAM)')
 ax = plt.subplot(gs[2],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -423,8 +463,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 
 im=ax.contourf(lons, lats, ds_jja_dif['pre'],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -439,7 +479,7 @@ ax.set_title('Invierno (JJA)')
 ax = plt.subplot(gs[3],projection=ccrs.PlateCarree(central_longitude=180))
 
 crs_latlon = ccrs.PlateCarree()
-ax.set_extent([LON_OESTE, LON_ESTE, LAT_NOR, LAT_SUR], crs=crs_latlon)
+ax.set_extent([LON_OESTE_G, LON_ESTE_G, LAT_NOR_G, LAT_SUR_G], crs=crs_latlon)
 ax.add_feature(cartopy.feature.OCEAN, zorder=100, edgecolor='k')
 ax.add_feature(cartopy.feature.COASTLINE)
 ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
@@ -454,8 +494,8 @@ ax.add_feature(states_provinces, edgecolor='gray')
 
 im=ax.contourf(lons, lats, ds_son_dif['pre'],levels=clevs,cmap="RdYlGn", extend='both',transform=crs_latlon)
 
-ax.set_xticks(np.arange(LON_OESTE,LON_ESTE,10), crs=crs_latlon)
-ax.set_yticks(np.arange(LAT_SUR,LAT_NOR,10), crs=crs_latlon)
+ax.set_xticks(np.arange(LON_OESTE_G,LON_ESTE_G,10), crs=crs_latlon)
+ax.set_yticks(np.arange(LAT_SUR_G,LAT_NOR_G,10), crs=crs_latlon)
 ax.grid(which='both', linewidth=0.3, linestyle='-')
 ax.tick_params(axis='both', which='major', labelsize=10)
 lon_formatter = LongitudeFormatter(zero_direction_label=True)
@@ -477,6 +517,6 @@ cbar_ax.set_title('mm')
 fig.colorbar(im, cax=cbar_ax,orientation='vertical')
 
 
-fig.savefig(SALIDAS + 'DiferenciaPeriodos_CRU.png', dpi=300, bbox_inches='tight')
+fig.savefig(SALIDAS + 'CA_DiferenciaPeriodos_CRU.png', dpi=300, bbox_inches='tight')
 
 fig.show()
