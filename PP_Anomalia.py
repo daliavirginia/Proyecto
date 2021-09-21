@@ -69,10 +69,10 @@ def trend_xarray(ds,VAR) :
 # Constantes (en mayuscula)
 
 # Para serie temporal CENTRO ARGENTINA
-LAT_SUR_M=-36
-LAT_NOR_M=-25
-LON_OESTE_M=293
-LON_ESTE_M=300
+LAT_SUR_M=-35
+LAT_NOR_M=-26
+LON_OESTE_M=294
+LON_ESTE_M=299
 
 #Para calculos de correlación
 LAT_SUR=-42
@@ -424,12 +424,12 @@ fig.savefig(SALIDAS+"Correlacion_PP_GPCC.png", dpi=300, bbox_inches='tight')
 #%%
 
 # Para serie temporal CENTRO ARGENTINA
-LON_OESTE_M=-67
-LON_ESTE_M=-60
+LON_OESTE_M=-66
+LON_ESTE_M=-61
 
 #Para calculos de correlación
-LON_OESTE=-73
-LON_ESTE=-54
+LON_OESTE=-72
+LON_ESTE=-55
 
 #Para graficar 
 LON_OESTE_G=-70
